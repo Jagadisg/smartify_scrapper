@@ -1,6 +1,6 @@
 # Climate Tech Jobs Scraper
 
-This project scrapes the Climate Tech Jobs webpage and saves the HTML content to a file.
+#### This project scrapes the Climate Tech Jobs webpage and saves the HTML content to a file.
 
 ## Prerequisites
 
@@ -13,27 +13,27 @@ This project scrapes the Climate Tech Jobs webpage and saves the HTML content to
 
 First, clone this repository to your local machine:
 
-git clone https://github.com/yourusername/climate-tech-jobs-scraper.git
-cd climate-tech-jobs-scraper
+`git clone https://github.com/yourusername/climate-tech-jobs-scraper.git`
+`cd climate-tech-jobs-scraper`
 
 ### 2. Create a Virtual Environment
 Create a virtual environment to isolate your dependencies:
 
-'python -m venv venv'
+`python -m venv venv`
 
 Activate the virtual environment:
 
 **On Windows:**
-'.\venv\Scripts\activate'
+`.\venv\Scripts\activate`
 
 **On macOS and Linux:**
-source venv/bin/activate
+`source venv/bin/activate`
 
 ### 3. Install the Requirements
 Install the required packages from requirements.txt:
 
-'pip install -r requirements.txt'
+`pip install -r requirements.txt`
 
 ### 4. Run the main.py
 
-'python main.py'
+`python main.py`
