@@ -1,1 +1,39 @@
-# smartify_scrapper
+# Climate Tech Jobs Scraper
+
+This project scrapes the Climate Tech Jobs webpage and saves the HTML content to a file.
+
+## Prerequisites
+
+- Python 3.x
+- Google Chrome browser
+
+## Setup Instructions
+
+### 1. Clone the Repository
+
+First, clone this repository to your local machine:
+
+git clone https://github.com/yourusername/climate-tech-jobs-scraper.git
+cd climate-tech-jobs-scraper
+
+### 2. Create a Virtual Environment
+Create a virtual environment to isolate your dependencies:
+
+'python -m venv venv'
+
+Activate the virtual environment:
+
+**On Windows:**
+'.\venv\Scripts\activate'
+
+**On macOS and Linux:**
+source venv/bin/activate
+
+### 3. Install the Requirements
+Install the required packages from requirements.txt:
+
+'pip install -r requirements.txt'
+
+### 4. Run the main.py
+
+'python main.py'
