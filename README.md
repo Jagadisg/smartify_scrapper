@@ -13,8 +13,9 @@
 
 First, clone this repository to your local machine:
 
-`git clone https://github.com/yourusername/climate-tech-jobs-scraper.git`
-`cd climate-tech-jobs-scraper`
+`https://github.com/Jagadisg/smartify_scrapper.git`
+
+`cd smartify_scrapper`
 
 ### 2. Create a Virtual Environment
 Create a virtual environment to isolate your dependencies:
@@ -34,6 +35,7 @@ Install the required packages from requirements.txt:
 
 `pip install -r requirements.txt`
 
-### 4. Run the main.py
+### 4. To run in local environment. 
+comment out the lambda handler function and add `asyncio.run(main)` at last line.
 
-`python main.py`
+Run this command in terminal or cmd `python main.py`
