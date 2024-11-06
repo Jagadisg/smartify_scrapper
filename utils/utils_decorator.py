@@ -8,17 +8,17 @@ def handle_find_element_exceptions(function):
             return function(*args, **kwargs)
         except NoSuchElementException:
             if len(args) > 1:
-                logger.warning(f"No such element {args[3]}")
+                logger.warning(f"No such element {args[-1]}")
             return None
         except TimeoutException:
             if len(args) > 1:
                 logger.warning(
-                    f"Timeout Exception: Element not found | For value: {args[3]}"
+                    f"Timeout Exception: Element not found | For value: {args[-1]}"
                 )
             return None
         except Exception as e:
             if len(args) > 1:
-                logger.error(f"{e} {args[3]}")
+                logger.error(f"{e} {args[-1]}")
             return None
 
     return wrapper

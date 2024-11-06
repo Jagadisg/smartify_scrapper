@@ -1,13 +1,16 @@
+import os 
+
 import boto3
 from loguru import logger
+from dotenv import load_dotenv
 from selenium.webdriver import Remote
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.support import expected_conditions as EC
+from botocore.exceptions import ClientError
 
 from utils.utils_global import wait_for_element_to_load, findelement, findelement_getattribute
 from utils.utils_decorator import handle_general_exceptions, handle_find_element_exceptions
 
+load_dotenv()
 
 class ClimateTech:
     def __init__(self, driver: Remote, website_link: str):
@@ -34,17 +37,24 @@ class ClimateTech:
         self.data = None
         self.linkedin_page = None
         self.links = []
-        self.run_scrapper()
+        self.id = None
+        self.dynamodb = boto3.resource(
+            'dynamodb',
+            region_name = 'eu-north-1',
+            aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY'),
+            )
 
         
     @handle_general_exceptions
-    def run_scrapper(self):
+    async def run_scraper(self):
         self.driver.get(self.website_link)
         if self.access_denied():
             return None
         self.get_job_links()
-        for link in self.links:
+        for id,link in enumerate(self.links):
             if isinstance(link, str):
+                self.id = id
                 self.driver.get(link)
                 self.job_url = link
                 self.position()
@@ -52,7 +62,7 @@ class ClimateTech:
                 self.salary = findelement(self.driver, By.XPATH, "//td[text()='Salary']/following-sibling::td","salary")
                 self.commitment = findelement(self.driver, By.XPATH, "//td[text()='Commitment']/following-sibling::td","commitment")
                 self.job_description = findelement(self.driver, By.XPATH,"//h1[text()='Job Description']/following-sibling::* | //h2[text()='Job Description']/following-sibling::*","job_description")
-                self.company_href = findelement_getattribute(self.driver, By.XPATH, "//a[contains(., 'Company Info →')]", "href")
+                self.company_href = findelement_getattribute(self.driver, By.XPATH, "//a[contains(., 'Company Info →')]", "href", "company_href")
                 if isinstance(self.company_href, str):
                     self.driver.get(self.company_href)
                     self.com_vertical()
@@ -65,10 +75,10 @@ class ClimateTech:
                     self.investors = findelement(self.driver, By.XPATH,"//td[text()='Investors']/following-sibling::td","investors")
                     self.company_location = findelement(self.driver, By.XPATH,"//td[text()='Location']/following-sibling::td", "company_location")
                     self.company_website = findelement(self.driver, By.XPATH,"//td[text()='Website']/following-sibling::td", "company_website")
-                    self.company_logo = findelement_getattribute(self.driver, By.CSS_SELECTOR, "div.css-1jgxixz img", "src")
+                    self.company_logo = findelement_getattribute(self.driver, By.CSS_SELECTOR, "div.css-1jgxixz img", "src", "company_logo")
                     self.company_description = findelement(self.driver, By.XPATH,"//h1[contains(., 'Company Info')]/following-sibling::* | //h2[contains(., 'Company Info')]/following-sibling::* | //h3[contains(., 'Company Info')]/following-sibling::*","company_description")
-                    self.get_scrapper()
-                    # self.insert_into_dynamodb(self.data)
+                    self.get_scrapper()                
+                    self.insert_into_dynamodb(self.data)
         return {"status":"Done"}
     
     
@@ -100,6 +110,7 @@ class ClimateTech:
     
     def get_scrapper(self):
         self.data = {
+                "job_id":self.id,
                 "job_url": self.job_url,
                 "job_title": self.job_title,
                 "job_location": self.job_location,
@@ -119,16 +130,19 @@ class ClimateTech:
                 "company_description": self.company_description,    
                 "LinkedIn page": self.linkedin_page,
                 }
-        print(self.data)
-        return self.data
+        logger.info(self.data)
   
     
     def insert_into_dynamodb(self,scraper_data):
-        dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table('job_list')
+        table = self.dynamodb.Table('job_list')
         try:
-            table.put_item(Item=scraper_data)
+            table.put_item(
+                Item=scraper_data,
+                ConditionExpression="attribute_not_exists(job_id)"
+                )
             print(f"Data inserted into DynamoDB table: {scraper_data}")
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
+                logger.debug("job_id already present in database")
         except Exception as e:
             print(f"Error inserting data into DynamoDB: {e}")
-            

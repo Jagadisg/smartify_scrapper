@@ -1,4 +1,6 @@
 loguru
 selenium
-undetected-chromedriver
 boto3
+asyncio
+dotenv
+undetected-chromedriver

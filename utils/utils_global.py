@@ -22,6 +22,6 @@ def findelement(driver: Remote, path: Union[By, str], value: str, variable : str
 
 
 @handle_find_element_exceptions
-def findelement_getattribute(driver: Remote, path: Union[By, str], value: str, attri: str):
+def findelement_getattribute(driver: Remote, path: Union[By, str], value: str, attri: str, variable : str):
     text = driver.find_element(path,value).get_attribute(attri)
     return text
